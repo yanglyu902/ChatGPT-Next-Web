@@ -214,13 +214,17 @@
   background-color: var(--color-canvas-default);
 }
 
-.markdown-body code,
+.markdown-body code {
+  font-family: monospace;
+  font-size: 1em;
+  color: #e54a70;
+}
+
 .markdown-body kbd,
 .markdown-body pre,
 .markdown-body samp {
   font-family: monospace;
   font-size: 1em;
-  color: #e54a70;
 }
 
 .markdown-body figure {
