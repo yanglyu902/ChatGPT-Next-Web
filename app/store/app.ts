@@ -25,9 +25,9 @@ export enum SubmitKey {
 }
 
 export enum Theme {
-  Auto = "auto",
-  Dark = "dark",
   Light = "light",
+  Dark = "dark",
+  Auto = "auto",
 }
 
 export interface ChatConfig {
