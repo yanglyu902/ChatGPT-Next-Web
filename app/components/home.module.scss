@@ -221,6 +221,14 @@
   margin-bottom: 100px;
 }
 
+.chat-body-title {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .chat-message {
   display: flex;
   flex-direction: row;
@@ -292,6 +300,7 @@
   position: absolute;
   right: 20px;
   top: -26px;
+  left: 100px;
   transition: all ease 0.3s;
   opacity: 0;
   pointer-events: none;
@@ -302,6 +311,7 @@
   .chat-message-top-action {
     opacity: 0.5;
     color: var(--black);
+    white-space: nowrap;
     cursor: pointer;
 
     &:hover {
@@ -408,7 +418,7 @@
   background-color: var(--white);
   color: var(--black);
   font-family: inherit;
-  padding: 10px 14px;
+  padding: 10px 14px 50px;
   resize: none;
   outline: none;
 }

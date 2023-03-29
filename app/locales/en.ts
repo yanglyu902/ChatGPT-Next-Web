@@ -1,3 +1,4 @@
+import { SubmitKey } from "../store/app";
 import type { LocaleType } from "./index";
 
 const en: LocaleType = {
@@ -19,9 +20,15 @@ const en: LocaleType = {
       Stop: "Stop",
       Retry: "Retry",
     },
+    Rename: "Rename Chat",
     Typing: "Typing…",
-    Input: (submitKey: string) =>
-      `Type something and press ${submitKey} to send`,
+    Input: (submitKey: string) => {
+      var inputHints = `Type something and press ${submitKey} to send`;
+      if (submitKey === String(SubmitKey.Enter)) {
+        inputHints += ", press Shift + Enter to newline";
+      }
+      return inputHints;
+    },
     Send: "Send",
   },
   Export: {
@@ -55,6 +62,10 @@ const en: LocaleType = {
       },
     },
     Avatar: "Avatar",
+    FontSize: {
+      Title: "Font Size",
+      SubTitle: "Adjust font size of chat content",
+    },
     Update: {
       Version: (x: string) => `Version: ${x}`,
       IsLatest: "Latest version",
@@ -69,7 +80,7 @@ const en: LocaleType = {
     Prompt: {
       Disable: {
         Title: "Disable auto-completion",
-        SubTitle: "After disabling, auto-completion will not be available",
+        SubTitle: "Input / to trigger auto-completion",
       },
       List: "Prompt List",
       ListCount: (builtin: number, custom: number) =>
@@ -89,6 +100,14 @@ const en: LocaleType = {
       Title: "API Key",
       SubTitle: "Use your key to ignore access code limit",
       Placeholder: "OpenAI API Key",
+    },
+    Usage: {
+      Title: "Account Balance",
+      SubTitle(granted: any, used: any) {
+        return `Total $${granted}, Used $${used}`;
+      },
+      IsChecking: "Checking...",
+      Check: "Check Again",
     },
     AccessCode: {
       Title: "Access Code",
