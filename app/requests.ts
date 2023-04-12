@@ -1,4 +1,4 @@
-import type { ChatRequest, ChatReponse } from "./api/openai/typing";
+import type { ChatRequest, ChatResponse } from "./api/openai/typing";
 import { Message, ModelConfig, useAccessStore, useChatStore } from "./store";
 import { showToast } from "./components/ui-lib";
 
@@ -20,7 +20,11 @@ const makeRequestParam = (
     sendMessages = sendMessages.filter((m) => m.role !== "assistant");
   }
 
-  const modelConfig = useChatStore.getState().config.modelConfig;
+  const modelConfig = { ...useChatStore.getState().config.modelConfig };
+
+  // @yidadaa: wont send max_tokens, because it is nonsense for Muggles
+  // @ts-expect-error
+  delete modelConfig.max_tokens;
 
   return {
     messages: sendMessages,
@@ -46,11 +50,10 @@ function getHeaders() {
 
 export function requestOpenaiClient(path: string) {
   return (body: any, method = "POST") =>
-    fetch("/api/openai", {
+    fetch("/api/openai?_vercel_no_cache=1", {
       method,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-cache",
         path,
         ...getHeaders(),
       },
@@ -64,7 +67,7 @@ export async function requestChat(messages: Message[]) {
   const res = await requestOpenaiClient("v1/chat/completions")(req);
 
   try {
-    const response = (await res.json()) as ChatReponse;
+    const response = (await res.json()) as ChatResponse;
     return response;
   } catch (error) {
     console.error("[Request Chat] ", error, res.body);
@@ -77,7 +80,7 @@ export async function requestUsage() {
       .getDate()
       .toString()
       .padStart(2, "0")}`;
-  const ONE_DAY = 24 * 60 * 60 * 1000;
+  const ONE_DAY = 2 * 24 * 60 * 60 * 1000;
   const now = new Date(Date.now() + ONE_DAY);
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startDate = formatDate(startOfMonth);
@@ -168,10 +171,15 @@ export async function requestChatStream(
         const resTimeoutId = setTimeout(() => finish(), TIME_OUT_MS);
         const content = await reader?.read();
         clearTimeout(resTimeoutId);
-        const text = decoder.decode(content?.value);
+
+        if (!content || !content.value) {
+          break;
+        }
+
+        const text = decoder.decode(content.value, { stream: true });
         responseText += text;
 
-        const done = !content || content.done;
+        const done = content.done;
         options?.onMessage(responseText, false);
 
         if (done) {

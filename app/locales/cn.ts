@@ -3,7 +3,7 @@ import { SubmitKey } from "../store/app";
 const cn = {
   WIP: "该功能仍在开发中……",
   Error: {
-    Unauthorized: "现在是未授权状态，请在设置页输入访问密码。",
+    Unauthorized: "现在是未授权状态，请点击左下角设置按钮输入访问密码。",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} 条对话`,
@@ -21,11 +21,11 @@ const cn = {
     Rename: "重命名对话",
     Typing: "正在输入…",
     Input: (submitKey: string) => {
-      var inputHints = `输入消息，${submitKey} 发送`;
+      var inputHints = `${submitKey} 发送`;
       if (submitKey === String(SubmitKey.Enter)) {
         inputHints += "，Shift + Enter 换行";
       }
-      return inputHints;
+      return inputHints + "，/ 触发补全";
     },
     Send: "发送",
   },
@@ -47,6 +47,8 @@ const cn = {
   Home: {
     NewChat: "新的聊天",
     DeleteChat: "确认删除选中的对话？",
+    DeleteToast: "已删除会话",
+    Revert: "撤销",
   },
   Settings: {
     Title: "设置",
@@ -55,6 +57,12 @@ const cn = {
       ClearAll: "清除所有数据",
       ResetAll: "重置所有选项",
       Close: "关闭",
+      ConfirmResetAll: {
+        Confirm: "Are you sure you want to reset all configurations?",
+      },
+      ConfirmClearAll: {
+        Confirm: "Are you sure you want to reset all chat?",
+      },
     },
     Lang: {
       Name: "Language",
@@ -64,6 +72,8 @@ const cn = {
         tw: "繁體中文",
         es: "Español",
         it: "Italiano",
+        tr: "Türkçe",
+        jp: "日本語",
       },
     },
     Avatar: "头像",
@@ -82,7 +92,7 @@ const cn = {
     },
     SendKey: "发送键",
     Theme: "主题",
-    TightBorder: "紧凑边框",
+    TightBorder: "无边框模式",
     SendPreviewBubble: "发送预览气泡",
     Prompt: {
       Disable: {
@@ -118,13 +128,13 @@ const cn = {
     },
     AccessCode: {
       Title: "访问密码",
-      SubTitle: "现在是未授权访问状态",
+      SubTitle: "已开启加密访问",
       Placeholder: "请输入访问密码",
     },
     Model: "模型 (model)",
     Temperature: {
       Title: "随机性 (temperature)",
-      SubTitle: "值越大，回复越随机",
+      SubTitle: "值越大，回复越随机，大于 1 的值可能会导致乱码",
     },
     MaxTokens: {
       Title: "单次回复限制 (max_tokens)",

@@ -50,6 +50,8 @@ const es: LocaleType = {
   Home: {
     NewChat: "Nuevo chat",
     DeleteChat: "¿Confirmar eliminación de la conversación seleccionada?",
+    DeleteToast: "Chat Deleted",
+    Revert: "Revert",
   },
   Settings: {
     Title: "Configuración",
@@ -58,6 +60,12 @@ const es: LocaleType = {
       ClearAll: "Borrar todos los datos",
       ResetAll: "Restablecer todas las configuraciones",
       Close: "Cerrar",
+      ConfirmResetAll: {
+        Confirm: "Are you sure you want to reset all configurations?",
+      },
+      ConfirmClearAll: {
+        Confirm: "Are you sure you want to reset all chat?",
+      },
     },
     Lang: {
       Name: "Language",
@@ -67,6 +75,8 @@ const es: LocaleType = {
         tw: "繁體中文",
         es: "Español",
         it: "Italiano",
+        tr: "Türkçe",
+        jp: "日本語",
       },
     },
     Avatar: "Avatar",
