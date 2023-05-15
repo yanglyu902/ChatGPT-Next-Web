@@ -69,7 +69,7 @@ const jp: LocaleType = {
       ConfirmClearAll: "すべてのチャットをリセットしてもよろしいですか？",
     },
     Lang: {
-      Name: "Language",
+      Name: "Language", // ATTENTION: if you wanna add a new translation, please do not translate this value, leave it as `Language`
       All: "所有语言",
       Options: {
         cn: "简体中文",
@@ -80,6 +80,9 @@ const jp: LocaleType = {
         tr: "Türkçe",
         jp: "日本語",
         de: "Deutsch",
+        vi: "Tiếng Việt",
+        ru: "Русский",
+        cs: "Čeština",
       },
     },
     Avatar: "アバター",
@@ -121,6 +124,9 @@ const jp: LocaleType = {
         Title: "プロンプトリスト",
         Add: "新規追加",
         Search: "プロンプトワード検索",
+      },
+      EditModal: {
+        Title: "编辑提示词",
       },
     },
     HistoryCount: {
@@ -225,6 +231,14 @@ const jp: LocaleType = {
     More: "搜索更多",
     NotShow: "不再展示",
     ConfirmNoShow: "确认禁用？禁用后可以随时在设置中重新启用。",
+  },
+
+  UI: {
+    Confirm: "确认",
+    Cancel: "取消",
+    Close: "关闭",
+    Create: "新建",
+    Edit: "编辑",
   },
 };
 

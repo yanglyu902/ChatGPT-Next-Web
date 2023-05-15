@@ -67,7 +67,7 @@ const tw: LocaleType = {
       ConfirmClearAll: "您確定要清除所有数据嗎？",
     },
     Lang: {
-      Name: "Language",
+      Name: "Language", // ATTENTION: if you wanna add a new translation, please do not translate this value, leave it as `Language`
       All: "所有语言",
       Options: {
         cn: "简体中文",
@@ -78,6 +78,9 @@ const tw: LocaleType = {
         tr: "Türkçe",
         jp: "日本語",
         de: "Deutsch",
+        vi: "Tiếng Việt",
+        ru: "Русский",
+        cs: "Čeština",
       },
     },
     Avatar: "大頭貼",
@@ -117,6 +120,9 @@ const tw: LocaleType = {
         Title: "提示詞列表",
         Add: "新增一條",
         Search: "搜尋提示詞",
+      },
+      EditModal: {
+        Title: "编辑提示词",
       },
     },
     HistoryCount: {
@@ -218,6 +224,13 @@ const tw: LocaleType = {
     More: "搜索更多",
     NotShow: "不再展示",
     ConfirmNoShow: "确认禁用？禁用后可以随时在设置中重新启用。",
+  },
+  UI: {
+    Confirm: "确认",
+    Cancel: "取消",
+    Close: "关闭",
+    Create: "新建",
+    Edit: "编辑",
   },
 };
 

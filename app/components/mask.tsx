@@ -13,16 +13,17 @@ import EyeIcon from "../icons/eye.svg";
 import CopyIcon from "../icons/copy.svg";
 
 import { DEFAULT_MASK_AVATAR, Mask, useMaskStore } from "../store/mask";
-import { Message, ModelConfig, ROLES, useChatStore } from "../store";
-import { Input, List, ListItem, Modal, Popover, showToast } from "./ui-lib";
+import { ChatMessage, ModelConfig, useChatStore } from "../store";
+import { ROLES } from "../client/api";
+import { Input, List, ListItem, Modal, Popover, Select } from "./ui-lib";
 import { Avatar, AvatarPicker } from "./emoji";
 import Locale, { AllLangs, Lang } from "../locales";
 import { useNavigate } from "react-router-dom";
 
 import chatStyle from "./chat.module.scss";
-import { useEffect, useState } from "react";
-import { downloadAs } from "../utils";
-import { Updater } from "../api/openai/typing";
+import { useState } from "react";
+import { downloadAs, readFromFile } from "../utils";
+import { Updater } from "../typing";
 import { ModelConfigList } from "./model-config";
 import { FileName, Path } from "../constant";
 import { BUILTIN_MASK_STORE } from "../masks";
@@ -106,13 +107,66 @@ export function MaskConfig(props: {
   );
 }
 
+function ContextPromptItem(props: {
+  prompt: ChatMessage;
+  update: (prompt: ChatMessage) => void;
+  remove: () => void;
+}) {
+  const [focusingInput, setFocusingInput] = useState(false);
+
+  return (
+    <div className={chatStyle["context-prompt-row"]}>
+      {!focusingInput && (
+        <Select
+          value={props.prompt.role}
+          className={chatStyle["context-role"]}
+          onChange={(e) =>
+            props.update({
+              ...props.prompt,
+              role: e.target.value as any,
+            })
+          }
+        >
+          {ROLES.map((r) => (
+            <option key={r} value={r}>
+              {r}
+            </option>
+          ))}
+        </Select>
+      )}
+      <Input
+        value={props.prompt.content}
+        type="text"
+        className={chatStyle["context-content"]}
+        rows={focusingInput ? 5 : 1}
+        onFocus={() => setFocusingInput(true)}
+        onBlur={() => setFocusingInput(false)}
+        onInput={(e) =>
+          props.update({
+            ...props.prompt,
+            content: e.currentTarget.value as any,
+          })
+        }
+      />
+      {!focusingInput && (
+        <IconButton
+          icon={<DeleteIcon />}
+          className={chatStyle["context-delete-button"]}
+          onClick={() => props.remove()}
+          bordered
+        />
+      )}
+    </div>
+  );
+}
+
 export function ContextPrompts(props: {
-  context: Message[];
-  updateContext: (updater: (context: Message[]) => void) => void;
+  context: ChatMessage[];
+  updateContext: (updater: (context: ChatMessage[]) => void) => void;
 }) {
   const context = props.context;
 
-  const addContextPrompt = (prompt: Message) => {
+  const addContextPrompt = (prompt: ChatMessage) => {
     props.updateContext((context) => context.push(prompt));
   };
 
@@ -120,7 +174,7 @@ export function ContextPrompts(props: {
     props.updateContext((context) => context.splice(i, 1));
   };
 
-  const updateContextPrompt = (i: number, prompt: Message) => {
+  const updateContextPrompt = (i: number, prompt: ChatMessage) => {
     props.updateContext((context) => (context[i] = prompt));
   };
 
@@ -128,42 +182,12 @@ export function ContextPrompts(props: {
     <>
       <div className={chatStyle["context-prompt"]} style={{ marginBottom: 20 }}>
         {context.map((c, i) => (
-          <div className={chatStyle["context-prompt-row"]} key={i}>
-            <select
-              value={c.role}
-              className={chatStyle["context-role"]}
-              onChange={(e) =>
-                updateContextPrompt(i, {
-                  ...c,
-                  role: e.target.value as any,
-                })
-              }
-            >
-              {ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-            <Input
-              value={c.content}
-              type="text"
-              className={chatStyle["context-content"]}
-              rows={1}
-              onInput={(e) =>
-                updateContextPrompt(i, {
-                  ...c,
-                  content: e.currentTarget.value as any,
-                })
-              }
-            />
-            <IconButton
-              icon={<DeleteIcon />}
-              className={chatStyle["context-delete-button"]}
-              onClick={() => removeContextPrompt(i)}
-              bordered
-            />
-          </div>
+          <ContextPromptItem
+            key={i}
+            prompt={c}
+            update={(prompt) => updateContextPrompt(i, prompt)}
+            remove={() => removeContextPrompt(i)}
+          />
         ))}
 
         <div className={chatStyle["context-prompt-row"]}>
@@ -174,7 +198,7 @@ export function ContextPrompts(props: {
             className={chatStyle["context-prompt-button"]}
             onClick={() =>
               addContextPrompt({
-                role: "system",
+                role: "user",
                 content: "",
                 date: "",
               })
@@ -222,6 +246,21 @@ export function MaskPage() {
     downloadAs(JSON.stringify(masks), FileName.Masks);
   };
 
+  const importFromFile = () => {
+    readFromFile().then((content) => {
+      try {
+        const importMasks = JSON.parse(content);
+        if (Array.isArray(importMasks)) {
+          for (const mask of importMasks) {
+            if (mask.name) {
+              maskStore.create(mask);
+            }
+          }
+        }
+      } catch {}
+    });
+  };
+
   return (
     <ErrorBoundary>
       <div className={styles["mask-page"]}>
@@ -247,7 +286,7 @@ export function MaskPage() {
               <IconButton
                 icon={<UploadIcon />}
                 bordered
-                onClick={() => showToast(Locale.WIP)}
+                onClick={() => importFromFile()}
               />
             </div>
             <div className="window-action-button">
@@ -269,7 +308,7 @@ export function MaskPage() {
               autoFocus
               onInput={(e) => onSearch(e.currentTarget.value)}
             />
-            <select
+            <Select
               className={styles["mask-filter-lang"]}
               value={filterLang ?? Locale.Settings.Lang.All}
               onChange={(e) => {
@@ -289,16 +328,18 @@ export function MaskPage() {
                   {Locale.Settings.Lang.Options[lang]}
                 </option>
               ))}
-            </select>
+            </Select>
 
-            <div className={styles["mask-create"]}>
-              <IconButton
-                icon={<AddIcon />}
-                text={Locale.Mask.Page.Create}
-                bordered
-                onClick={() => maskStore.create()}
-              />
-            </div>
+            <IconButton
+              className={styles["mask-create"]}
+              icon={<AddIcon />}
+              text={Locale.Mask.Page.Create}
+              bordered
+              onClick={() => {
+                const createdMask = maskStore.create();
+                setEditingMaskId(createdMask.id);
+              }}
+            />
           </div>
 
           <div>
@@ -368,6 +409,12 @@ export function MaskPage() {
                 text={Locale.Mask.EditModal.Download}
                 key="export"
                 bordered
+                onClick={() =>
+                  downloadAs(
+                    JSON.stringify(editingMask),
+                    `${editingMask.name}.json`,
+                  )
+                }
               />,
               <IconButton
                 key="copy"
